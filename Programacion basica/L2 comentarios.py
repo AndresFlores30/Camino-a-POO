@@ -3,7 +3,6 @@ Este es un comentario
 multilínea de Python.
 Con él, podemos ir escribiendo múltiples líneas.
 '''
-
 saludo = "Hola mundo" #almacenamos el string en la variable
 print(saludo) #imprimimos la variable con el valor contenido
 
