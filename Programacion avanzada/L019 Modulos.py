@@ -1,0 +1,137 @@
+import unicodedata
+
+# Funcion para normalizar texto
+def normalizar_texto(texto: str) -> str:
+    # Pasar a minúsculas
+    texto = texto.lower()
+    # Eliminar acentos
+    texto = ''.join(
+        c for c in unicodedata.normalize('NFD', texto)
+        if unicodedata.category(c) != 'Mn'
+    )
+    return texto
+
+
+# clase base 
+class Planta:
+    def __init__(self, nombre, familia, distribucion, estado_conservacion):
+        self.nombre = nombre
+        self.familia = familia
+        self.distribucion = distribucion
+        self.estado_conservacion = estado_conservacion
+
+    def mostrar_info(self):
+        print(f"Nombre: {self.nombre}")
+        print(f"Familia: {self.familia}")
+        print(f"Distribución: {', '.join(self.distribucion)}")
+        print(f"Estado de conservación: {self.estado_conservacion}")
+
+
+# clase heredada de Planta
+class Flor(Planta):
+    def __init__(self, nombre, nombre_cientifico, familia, distribucion, estado_conservacion, colores):
+        super().__init__(nombre, familia, distribucion, estado_conservacion)
+        self.nombre_cientifico = nombre_cientifico
+        self.colores = colores
+
+    def mostrar_info(self):
+        super().mostrar_info()
+        print(f"Nombre científico: {self.nombre_cientifico}")
+        print(f"Colores: {', '.join(self.colores)}")
+
+
+# clase almanaque
+class AlmanaqueFlores:
+    def __init__(self):
+        self.flores = {}
+
+    def agregar_flor(self, flor):
+        clave = normalizar_texto(flor.nombre)
+        if clave in self.flores:
+            print("Esa flor ya existe en el almanaque.")
+        else:
+            self.flores[clave] = flor
+            print(f"{flor.nombre} ha sido agregada al almanaque.")
+
+    def mostrar_flores(self):
+        if not self.flores:
+            print("No hay flores en el almanaque.")
+        else:
+            print("\nListado de flores en el almanaque:")
+            for flor in self.flores.values():
+                print("-", flor.nombre)
+
+    def buscar_flor(self, nombre):
+        clave = normalizar_texto(nombre)
+        if clave in self.flores:
+            self.flores[clave].mostrar_info()
+        else:
+            print("Esa flor no está en el almanaque.")
+
+    def eliminar_flor(self, nombre):
+        clave = normalizar_texto(nombre)
+        if clave in self.flores:
+            nombre_real = self.flores[clave].nombre
+            del self.flores[clave]
+            print(f"{nombre_real} ha sido eliminada.")
+        else:
+            print("Esa flor no existe en el almanaque.")
+
+
+# principal
+def menu():
+    almanaque = AlmanaqueFlores()
+
+    # Agregamos flores iniciales
+    almanaque.agregar_flor(Flor(
+        "Rosa", "Rosa spp.", "Rosaceae",
+        ["Europa", "Asia", "América del Norte"],
+        "Cultivada ampliamente", ["rojo", "blanco", "rosado", "amarillo"]
+    ))
+    almanaque.agregar_flor(Flor(
+        "Tulipán", "Tulipa spp.", "Liliaceae",
+        ["Turquía", "Países Bajos", "Asia Central"],
+        "Cultivada", ["rojo", "amarillo", "morado", "blanco"]
+    ))
+    almanaque.agregar_flor(Flor(
+        "Loto", "Nelumbo nucifera", "Nelumbonaceae",
+        ["India", "China", "Sudeste Asiático"],
+        "No amenazada", ["rosa", "blanco"]
+    ))
+
+    while True:
+        print("\n--- ALMANAQUE DE FLORES ---")
+        print("1. Ver todas las flores")
+        print("2. Buscar una flor")
+        print("3. Agregar una flor")
+        print("4. Eliminar una flor")
+        print("5. Salir")
+
+        opcion = input("Seleccione una opción: ")
+
+        match opcion:
+            case "1":
+                almanaque.mostrar_flores()
+            case "2":
+                flor_buscar = input("Ingrese el nombre de la flor: ")
+                almanaque.buscar_flor(flor_buscar)
+            case "3":
+                nombre = input("Ingrese el nombre de la nueva flor: ")
+                nombre_cientifico = input("Nombre científico: ")
+                familia = input("Familia: ")
+                distribucion = input("Distribución (separada por comas): ").split(",")
+                estado_conservacion = input("Estado de conservación: ")
+                colores = input("Colores (separados por comas): ").split(",")
+
+                nueva_flor = Flor(nombre, nombre_cientifico, familia, distribucion, estado_conservacion, colores)
+                almanaque.agregar_flor(nueva_flor)
+            case "4":
+                flor_eliminar = input("Ingrese el nombre de la flor a eliminar: ")
+                almanaque.eliminar_flor(flor_eliminar)
+            case "5":
+                print("Saliendo del almanaque... ¡Hasta luego!")
+                break
+            case _:
+                print("Opción inválida. Intente de nuevo.")
+
+menu()
